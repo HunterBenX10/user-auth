@@ -41,8 +41,8 @@ cd user-auth
 # Install dependencies
 npm install
 
-
-⚙️ Environment Variables
+**
+⚙️ Environment Variables**
 
 Create a .env file in the root directory with:
 
@@ -53,7 +53,7 @@ EMAIL_USER=your_email_address
 EMAIL_PASS=your_email_password
 OTP_EXPIRY=5m
 
-▶️ Running the Project
+**▶️ Running the Project**
 # Start the server
 npm start
 
@@ -126,11 +126,11 @@ Confirms the OTP matches and is within expiry
 
 Returns a success response or error if OTP is invalid/expired
 
-✨ Author
+**✨ Author**
 
 Emmanuel Ben-Eboh
 
-📌 Future Improvements
+**📌 Future Improvements**
 
 Add password reset functionality
 
