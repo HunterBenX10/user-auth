@@ -33,12 +33,15 @@ This project allows users to register, verify their email, log in securely, and 
 ## 📦 Installation
 
 # Clone the repository
+
 git clone https://github.com/HunterBenX10/user-auth.git
 
 # Navigate to the project folder
+
 cd user-auth
 
 # Install dependencies
+
 npm install
 
 **
@@ -54,13 +57,17 @@ EMAIL_PASS=your_email_password
 OTP_EXPIRY=5m
 
 **▶️ Running the Project**
+
 # Start the server
+
 npm start
 
 # OR start with nodemon for development
+
 npm run dev
 
 📡 API Endpoints
+
 1. Register a New User
 
 POST /api/auth/register
@@ -68,11 +75,10 @@ POST /api/auth/register
 Body:
 
 {
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "mypassword123"
+"name": "John Doe",
+"email": "john@example.com",
+"password": "mypassword123"
 }
-
 
 Behavior:
 
@@ -95,17 +101,16 @@ POST /api/auth/login
 Body:
 
 {
-  "email": "john@example.com",
-  "password": "mypassword123"
+"email": "john@example.com",
+"password": "mypassword123"
 }
-
 
 Response:
 
 {
-  "success": true,
-  "token": "your_jwt_token",
-  "otp_required": true
+"success": true,
+"token": "your_jwt_token",
+"otp_required": true
 }
 
 4. Verify OTP
@@ -115,10 +120,9 @@ POST /api/auth/verify-otp
 Body:
 
 {
-  "email": "john@example.com",
-  "otp": "123456"
+"email": "john@example.com",
+"otp": "123456"
 }
-
 
 Behavior:
 
