@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
+import transporter from "../config/nodemailer.js";
 
 // REGISTER
 export const register = async (req, res) => {
@@ -57,6 +58,22 @@ export const login = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    // Send welcome email
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: email,
+      subject: `Welcome to Flux!`,
+      text: `Thank you for joining Flux! Your account has been successfully created with email: ${email}.`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+      } else {
+        console.log("Email sent:", info.response);
+      }
     });
 
     res.json({ success: true, token });
