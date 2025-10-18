@@ -6,28 +6,28 @@ dotenv.config();
 const connectDB = async () => {
   try {
     const mongoURI = process.env.MONGODB_URI;
+    if (!mongoURI) throw new Error("MONGODB_URI is not defined in .env file");
 
-    if (!mongoURI) {
-      throw new Error("MONGODB_URI is not defined in .env file");
-    }
-
-    // Remove any trailing slashes and database name from the connection string
     const cleanURI = mongoURI.replace(/\/+$/, "");
 
-    // Updated connection without deprecated options
-    await mongoose.connect(cleanURI);
-
+    // Register listeners BEFORE connect
     mongoose.connection.on("connected", () => {
-      console.log("✅ MongoDB connected successfully");
+      console.log("✅ Mongo DB is connected");
     });
+    mongoose.connection.once("open", () => {
+      console.log("📡 MongoDB connection is open");
+    });
+    mongoose.connection.on("error", (err) =>
+      console.error("❌ MongoDB error:", err)
+    );
+    mongoose.connection.on("disconnected", () =>
+      console.log("❗ MongoDB disconnected")
+    );
 
-    mongoose.connection.on("error", (err) => {
-      console.error("❌ MongoDB connection error:", err);
-    });
+    const opts = {};
+    if (process.env.MONGODB_DB) opts.dbName = process.env.MONGODB_DB;
 
-    mongoose.connection.on("disconnected", () => {
-      console.log("❗ MongoDB disconnected");
-    });
+    await mongoose.connect(cleanURI, opts);
   } catch (error) {
     console.error("❌ MongoDB connection error:", error);
     process.exit(1);
