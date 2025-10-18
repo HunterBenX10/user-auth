@@ -111,10 +111,9 @@ export const verifyOtp = async (req, res) => {
     const otp = String(Math.floor(100000 + Math.random() * 900000));
 
     user.verifyOtp = otp;
-    user.VerifyOtpExpireAt = Date.now() + 24 * 60 * 1000; // OTP valid for 24 hours
+    user.VerifyOtpExpireAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
     await user.save();
 
-    // Send OTP email
     const mailOptions = {
       from: process.env.SENDER_EMAIL,
       to: user.email,
@@ -123,7 +122,6 @@ export const verifyOtp = async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-
     res.json({ success: true, message: "OTP sent to email" });
   } catch (error) {
     res.json({ success: false, message: error.message });
