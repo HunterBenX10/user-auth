@@ -1,6 +1,5 @@
-import { createContext, useEffect } from "react";
-import { useState } from "react";
-import { toast } from "react-toastify";
+import { createContext, useEffect, useState } from "react";
+
 import axios from "axios";
 
 const AppContext = createContext();
@@ -12,29 +11,32 @@ export const AppContextProvider = (props) => {
 
   const getAuthStatus = async () => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/auth/is-auth`);
-      if (data.success) {
+      const { data } = await axios.get("/api/auth/is-auth");
+      if (data.success && data.isAuthenticated) {
         setIsLoggedIn(true);
-        getUserData();
+        await getUserData();
+      } else {
+        setIsLoggedIn(false);
+        setUserData(false);
       }
-    } catch (error) {
-      toast.error(error.message);
+    } catch {
+      setIsLoggedIn(false);
+      setUserData(false);
     }
   };
 
   const getUserData = async () => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/user/data`);
+      const { data } = await axios.get("/api/user/data");
       if (data.success) {
-        setUserData(data.user);
+        setUserData(data.userData);
       }
-    } catch (error) {
-      toast.error(error.message);
+    } catch {
+      // ignore 401 here
     }
   };
 
   useEffect(() => {
-    axios.defaults.withCredentials = true;
     getAuthStatus();
   });
 

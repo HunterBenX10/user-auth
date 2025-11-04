@@ -50,7 +50,7 @@ const Navbar = () => {
 
           <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-10">
             <ul className="list-none m-0 p-2 bg-gray-100 text-sm">
-              {!userData.isAccountVerified && (
+              {!userData.isVerified && (
                 <li
                   onClick={sendVerificationOtp}
                   className="py-1 px-2 hover:bg-gray-200 cursor-pointer"

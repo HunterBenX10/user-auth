@@ -28,12 +28,14 @@ export const register = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    await transporter.sendMail({
+    // In register (use a defined variable name and send it)
+    const mailOptions = {
       from: process.env.SENDER_EMAIL,
       to: email,
       subject: "Welcome to Flux!",
       text: `Hi ${name},\n\nWelcome to Flux! Your account has been successfully created.\n\nBest regards,\nThe Flux Team`,
-    });
+    };
+    await transporter.sendMail(mailOptions);
 
     return res.json({ success: true, message: "Registered successfully" });
   } catch (error) {
@@ -95,11 +97,6 @@ export const logout = (req, res) => {
 export const sendverifyOtp = async (req, res) => {
   try {
     const userId = req.userId || req.body.userId;
-    if (!userId)
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing userId" });
-
     const user = await User.findById(userId);
     if (!user)
       return res
@@ -112,9 +109,8 @@ export const sendverifyOtp = async (req, res) => {
         .json({ success: false, message: "Account already verified" });
 
     const otp = String(Math.floor(100000 + Math.random() * 900000));
-
     user.verifyOtp = otp;
-    user.verifyOtpExpireAt = Date.now() + 24 * 60 * 60 * 1000; // 24h
+    user.verifyOtpExpireAt = Date.now() + 24 * 60 * 60 * 1000;
     await user.save();
 
     await transporter.sendMail({
@@ -123,8 +119,6 @@ export const sendverifyOtp = async (req, res) => {
       subject: "Your Account Verification OTP Code",
       text: `Your OTP code is ${otp}. It is valid for 24 hours.`,
     });
-
-    await transporter.sendMail(mailOption);
 
     return res.json({ success: true, message: "OTP sent to email" });
   } catch (error) {
@@ -174,32 +168,29 @@ export const verifyEmail = async (req, res) => {
 
 // Verify the Email using OTP
 export const isAuthenticated = (req, res) => {
-  const userId = req.userId;
-  if (!userId) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Not Authorized. Login Again" });
-  }
+  const auth = req.headers.authorization || "";
+  const bearer = auth.startsWith("Bearer ") ? auth.slice(7).trim() : null;
+  const token = req.cookies?.token || bearer || req.headers["x-access-token"];
 
+  if (!token || typeof token !== "string") {
+    return res.json({ success: true, isAuthenticated: false });
+  }
   try {
-    return res.json({ success: true, message: "User is authenticated" });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, message: "Server Error: " + error.message });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return res.json({
+      success: true,
+      isAuthenticated: true,
+      userId: decoded.id,
+    });
+  } catch {
+    return res.json({ success: true, isAuthenticated: false });
   }
 };
 
 // Send Password Reset OTP to Email
 export const sendResetOtp = async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Email is required" });
-  }
   try {
+    const { email } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
       return res
@@ -215,12 +206,12 @@ export const sendResetOtp = async (req, res) => {
 
     await transporter.sendMail({
       from: process.env.SENDER_EMAIL,
-      to: user.email,
-      subject: "Your Password Reset OTP Code",
-      text: `Your OTP code for resetting your password is ${otp}. Use this code to reset your password. It is valid for 15 minutes.`,
+      to: email,
+      subject: "Password Reset OTP",
+      text: `Your password reset OTP is ${otp}. It is valid for 15 minutes.`,
     });
 
-    return res.json({ success: true, message: "OTP sent to email" });
+    return res.json({ success: true, message: "Reset OTP sent to email" });
   } catch (error) {
     return res.json({ success: false, message: error.message });
   }

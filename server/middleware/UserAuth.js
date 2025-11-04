@@ -1,7 +1,6 @@
-// Find token from cookie and from token userId
-
 import jwt from "jsonwebtoken";
 
+// Find token from cookie and from header
 const userAuth = (req, res, next) => {
   const auth = req.headers.authorization || "";
   const bearer = auth.startsWith("Bearer ") ? auth.slice(7).trim() : null;
