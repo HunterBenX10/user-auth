@@ -10,12 +10,14 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 connectDB();
 
+const allowedOrigins = ["http://localhost:5000", "http://localhost:3000"];
+
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5000",
+    origin: allowedOrigins,
     credentials: true,
   })
 );
